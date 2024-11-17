@@ -1,28 +1,43 @@
-import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../provider/AuthProvider";
 
 const Register = () => {
 
-    const {createNewUser, setUser} = useContext(AuthContext)
+    const { createNewUser, setUser, updateUserProfile } = useContext(AuthContext);
+    const [error, setError] = useState({});
+    const navigate = useNavigate()
 
     const handleSubmit = (e) => {
         e.preventDefault();
         // get form data
         const form = new FormData(e.target);
         const name = form.get("name");
+        if (name.length < 3) {
+            setError({ ...error, name: "Name must contain 3 or more characters!" });
+            return;
+        } else (
+            setError("")
+        )
         const email = form.get("email");
         const password = form.get("password");
         const photo = form.get("photo");
         console.log({ name, email, photo, password })
         createNewUser(email, password)
-        .then((res)=>{
-            const user = res.user;
-            setUser(user)
-        })
-        .catch((err)=>{
-            console.log("ERROR", err)
-        })
+            .then((res) => {
+                const user = res.user;
+                setUser(user)
+                updateUserProfile({displayName:name, photoURL:photo})
+                .then(()=>{
+                    navigate('/')
+                })
+                .catch((err)=>{
+                    console.log(err)
+                })
+            })
+            .catch((err) => {
+                console.log("ERROR", err)
+            })
     };
     return (
         <div className="min-h-screen flex justify-center items-center ">
@@ -43,7 +58,13 @@ const Register = () => {
                             required
                         />
                     </div>
-
+                    {
+                        error.name && (
+                            <label className="label">
+                                <span className="label-text text-xs text-red-600">{error.name}</span>
+                            </label>
+                        )
+                    }
                     <div className="form-control">
                         <label className="label">
                             <span className="label-text">Photo URL</span>

@@ -5,7 +5,8 @@ import { AuthContext } from "../provider/AuthProvider";
 
 const Navbar = () => {
 
-  const {user,logOut} = useContext(AuthContext)
+  const {user,logOut} = useContext(AuthContext);
+  console.log(import.meta.env.VITE_a)
 
   return (
     <div className="flex justify-between items-center">
@@ -17,7 +18,13 @@ const Navbar = () => {
       </div>
       <div className="login flex gap-2 items-center">
         <div className=" ">
+          {
+            user && user?.email ? <div className="flex flex-col justify-center items-center">
+              <img className="w-10 h-10 rounded-full" src={user.photoURL} alt="" />
+              <p>{user.displayName}</p>
+            </div> : 
           <img src={userIcon} alt="" />
+          }
         </div>
         {
           user && user?.email ? <button onClick={logOut} className="btn btn-neutral rounded-none">Sign Out</button> : <Link to='/auth/login' className="btn btn-neutral rounded-none">Login</Link>
